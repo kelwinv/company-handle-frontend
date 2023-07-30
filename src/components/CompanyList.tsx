@@ -22,7 +22,7 @@ const CompanyList = ({ companies }: CompanyListProps) => {
           cnpj={cnpj}
           companyName={companyName}
           tradingName={tradingName}
-          idx={idx}
+          idx={idx + 1}
           key={id}
         />
       ))}

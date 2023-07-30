@@ -18,8 +18,6 @@ const Company = ({
   cnae,
   idx,
 }: CompanyProps) => {
-  console.log(navigator);
-
   const copyTextToClipboard = async () => {
     if (!("clipboard" in navigator)) return;
 
