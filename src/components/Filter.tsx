@@ -1,12 +1,20 @@
 import {
+  Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
+  IconButton,
+  Input,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
-  TextField,
 } from "@mui/material";
 import { useCallback, useState } from "react";
+import { AiOutlineSearch } from "react-icons/ai";
 
 type FilterProps = {
   accFilter: filterType;
@@ -30,32 +38,40 @@ const Filter: React.FC<FilterProps> = ({ setFilter, accFilter }) => {
   const [sort, setSort] = useState(accFilter.sort);
   const [direction, setDirection] = useState(accFilter.direction);
   const [companyName, setCompanyName] = useState("");
+  const [openOrderList, setOpenOrderList] = useState(false);
 
-  const handleSearchSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      const newFilter = {
-        company_name: companyName || null,
-        limit,
-        sort,
-        direction,
-      };
+  const updateFilter = useCallback(() => {
+    const newFilter = {
+      company_name: companyName || null,
+      limit,
+      sort,
+      direction,
+    };
 
-      setFilter((oldFilter) => ({ ...oldFilter, ...newFilter }));
-    },
-    [limit, sort, direction, companyName, setFilter],
-  );
+    setFilter((oldFilter) => ({ ...oldFilter, ...newFilter }));
+  }, [limit, sort, direction, companyName, setFilter]);
 
   return (
-    <div className="max-h-[80vh] overflow-y-auto bg-gray-100 p-4">
-      <form onSubmit={handleSearchSubmit}>
-        <FormControl variant="outlined" fullWidth className="mb-4">
+    <div className="m-auto flex w-full flex-col justify-between gap-4 md:flex-row">
+      <Box className="flex flex-1 items-end justify-between gap-4 md:justify-start">
+        <Button
+          onClick={() => setOpenOrderList(true)}
+          className="flex"
+          variant="outlined"
+        >
+          Ordenar Lista
+        </Button>
+        <FormControl variant="outlined" fullWidth className="max-w-[6rem]">
           <InputLabel htmlFor="limit">Limit:</InputLabel>
           <Select
             id="limit"
             value={limit}
-            onChange={(e) => setLimit(parseInt(e.target.value as string))}
+            onChange={(e) => {
+              setLimit(parseInt(e.target.value as string));
+              updateFilter();
+            }}
             label="Limit"
+            variant="standard"
           >
             {[5, 10, 15, 20, 25, 30].map((value) => (
               <MenuItem key={value} value={value}>
@@ -64,51 +80,85 @@ const Filter: React.FC<FilterProps> = ({ setFilter, accFilter }) => {
             ))}
           </Select>
         </FormControl>
-
-        <FormControl variant="outlined" fullWidth className="mb-4">
-          <InputLabel htmlFor="sort">Sort:</InputLabel>
-          <Select
-            id="sort"
-            value={sort}
-            onChange={(e) => setSort(e.target.value as string)}
-            label="Sort"
-          >
-            <MenuItem value="">Selecione...</MenuItem>
-            <MenuItem value="id">ID</MenuItem>
-            <MenuItem value="cnae">CNAE</MenuItem>
-            <MenuItem value="cnpj">CNPJ</MenuItem>
-            <MenuItem value="company_name">Nome da Empresa</MenuItem>
-            <MenuItem value="trading_name">Nome Fantasia</MenuItem>
-          </Select>
+      </Box>
+      <Box>
+        <FormControl variant="standard">
+          <InputLabel htmlFor="standard-company">Busque empresas</InputLabel>
+          <Input
+            id="standard-company"
+            type={"text"}
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                updateFilter();
+              }
+            }}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton onClick={() => updateFilter()}>
+                  <AiOutlineSearch />
+                </IconButton>
+              </InputAdornment>
+            }
+          />
         </FormControl>
+      </Box>
+      <Dialog
+        disableEscapeKeyDown
+        open={openOrderList}
+        onClose={() => setOpenOrderList(false)}
+      >
+        <DialogTitle>Ordenar Lista</DialogTitle>
+        <DialogContent>
+          <Box component="form" className="flex flex-wrap gap-4 p-4">
+            <FormControl variant="outlined" sx={{ m: 1, minWidth: 120 }}>
+              <InputLabel htmlFor="sort">Sort:</InputLabel>
+              <Select
+                id="sort"
+                value={sort}
+                onChange={(e) => setSort(e.target.value as string)}
+                label="Sort"
+              >
+                <MenuItem value="">Selecione...</MenuItem>
+                <MenuItem value="id">ID</MenuItem>
+                <MenuItem value="cnae">CNAE</MenuItem>
+                <MenuItem value="cnpj">CNPJ</MenuItem>
+                <MenuItem value="company_name">Nome da Empresa</MenuItem>
+                <MenuItem value="trading_name">Nome Fantasia</MenuItem>
+              </Select>
+            </FormControl>
 
-        <FormControl variant="outlined" fullWidth className="mb-4">
-          <InputLabel htmlFor="direction">Direction:</InputLabel>
-          <Select
-            id="direction"
-            value={direction}
-            onChange={(e) => setDirection(e.target.value as "asc" | "desc")}
-            label="Direction"
+            <FormControl
+              variant="outlined"
+              sx={{ m: 1, minWidth: 120 }}
+              className=""
+            >
+              <InputLabel htmlFor="direction">Direction:</InputLabel>
+              <Select
+                id="direction"
+                value={direction}
+                onChange={(e) => setDirection(e.target.value as "asc" | "desc")}
+                label="Direction"
+              >
+                <MenuItem value="asc">Ascendente</MenuItem>
+                <MenuItem value="desc">Descendente</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenOrderList(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              setOpenOrderList(false);
+              updateFilter();
+            }}
           >
-            <MenuItem value="asc">Ascendente</MenuItem>
-            <MenuItem value="desc">Descendente</MenuItem>
-          </Select>
-        </FormControl>
-
-        <TextField
-          variant="outlined"
-          fullWidth
-          id="search"
-          label="Buscar por nome da empresa"
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
-          className="mb-4"
-        />
-
-        <Button variant="contained" type="submit" className="mr-4">
-          Buscar
-        </Button>
-      </form>
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
