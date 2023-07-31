@@ -25,7 +25,7 @@ const Company = ({
   };
 
   return (
-    <div className="w-full max-w-xl flex-col rounded-sm bg-indigo-50  drop-shadow-md">
+    <div className="group/card w-full max-w-xl flex-col rounded-sm  bg-indigo-50 drop-shadow-md">
       <span className="absolute right-2 top-2 text-gray-900">{idx}</span>
       <section className="flex justify-between p-6">
         <div>
@@ -52,23 +52,25 @@ const Company = ({
         </p>
       </div>
       <div className="h-[1px] w-full bg-gray-300" />
-      <section className="flex gap-2 p-2 align-middle">
-        <Chip
-          label="Deletable"
-          onClick={() => alert("deletado")}
-          icon={<AiFillDelete className="h-4 w-4" />}
-          variant="outlined"
-          color="error"
-          className="rounded-md p-1"
-        />
-        <Chip
-          label="Excluir Empresa"
-          onClick={() => alert("editar")}
-          icon={<AiFillEdit className="h-4 w-4" />}
-          variant="outlined"
-          color="info"
-          className="rounded-md p-1"
-        />
+      <section className="h-0 overflow-hidden duration-500 ease-out group-hover/card:h-12 ">
+        <div className="flex gap-2 p-2 align-middle ease-linear">
+          <Chip
+            label="Deletable"
+            onClick={() => alert("deletado")}
+            icon={<AiFillDelete className="h-4 w-4" />}
+            variant="outlined"
+            color="error"
+            className="rounded-md p-1"
+          />
+          <Chip
+            label="Excluir Empresa"
+            onClick={() => alert("editar")}
+            icon={<AiFillEdit className="h-4 w-4" />}
+            variant="outlined"
+            color="info"
+            className="rounded-md p-1"
+          />
+        </div>
       </section>
     </div>
   );
