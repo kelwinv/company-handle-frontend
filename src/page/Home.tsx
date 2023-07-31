@@ -27,6 +27,7 @@ type companiesResponseType = {
 
 const Home = () => {
   const [companies, setCompanies] = useState<companiesType>([]);
+  const [isLoadCompany, setIsLoadCompany] = useState<boolean>(true);
   const [accPage, setAccPage] = useState<number>(0);
   const [totalPages, setSetTotalPages] = useState<number>(1);
   const [filter, setFilter] = useState<filterType>({
@@ -49,13 +50,19 @@ const Home = () => {
   };
 
   const getCompanies = useCallback(async () => {
+    setCompanies([]);
+    setIsLoadCompany(true);
+
     const { data } = await api.get<companiesResponseType>("/companies", {
       params: filter,
     });
     const companies = convertDataToCompanies(data.companies);
+
     setCompanies(companies);
     setSetTotalPages(data.total_pages);
+
     setAccPage(1);
+    setIsLoadCompany(false);
   }, [filter]);
 
   const getNextPageCompanies = useCallback(async () => {
@@ -80,12 +87,13 @@ const Home = () => {
           text: "crie sua empresa",
         }}
       />
-      <main className="flex-1 py-10 duration-300 ease-in">
+      <main className="m-auto flex w-full max-w-[min(74rem,90vw)] flex-1 flex-col gap-12 py-10 duration-300 ease-in ">
         <Filter accFilter={filter} setFilter={setFilter} />
         <CompanyList
           companies={companies}
           getNextPage={getNextPageCompanies}
           hasMorePages={totalPages > accPage}
+          isLoading={isLoadCompany}
         />
       </main>
       <footer className="h-24 w-full">INFO de contato</footer>
