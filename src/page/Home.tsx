@@ -3,6 +3,7 @@ import { CompanyList } from "../components/CompanyList";
 import { DefaultHeader } from "../components/DefaultHeader";
 import { api } from "../server/api";
 import { useDidUpdateEffect } from "../utils/useDidUpdateEffect";
+import { Filter, filterType } from "../components/Filter";
 
 type companiesType = {
   id: string;
@@ -26,18 +27,45 @@ type companiesResponseType = {
 
 const Home = () => {
   const [companies, setCompanies] = useState<companiesType>([]);
+  const [accPage, setAccPage] = useState<number>(0);
+  const [totalPages, setSetTotalPages] = useState<number>(1);
+  const [filter, setFilter] = useState<filterType>({
+    start: 0,
+    limit: 5,
+    direction: "asc",
+  });
 
-  const getCompanies = useCallback(async () => {
-    const { data } = await api.get<companiesResponseType>("/companies");
-    const companies = data.companies.map((company) => ({
+  const convertDataToCompanies = (
+    companies: companiesResponseType["companies"],
+  ) => {
+    const newCompanies = companies.map((company) => ({
       id: company.id,
       cnae: company.cnae,
       cnpj: company.cnpj,
       companyName: company.company_name,
       tradingName: company.trading_name,
     }));
+    return newCompanies;
+  };
+
+  const getCompanies = useCallback(async () => {
+    const { data } = await api.get<companiesResponseType>("/companies", {
+      params: filter,
+    });
+    const companies = convertDataToCompanies(data.companies);
     setCompanies(companies);
-  }, []);
+    setSetTotalPages(data.total_pages);
+    setAccPage(1);
+  }, [filter]);
+
+  const getNextPageCompanies = useCallback(async () => {
+    const { data } = await api.get<companiesResponseType>("/companies", {
+      params: { ...filter, start: accPage },
+    });
+    const companies = convertDataToCompanies(data.companies);
+    setCompanies((oldCompanies) => [...oldCompanies, ...companies]);
+    setAccPage((old) => old + 1);
+  }, [filter, accPage]);
 
   useDidUpdateEffect(() => {
     getCompanies();
@@ -53,9 +81,12 @@ const Home = () => {
         }}
       />
       <main className="flex-1 py-10 duration-300 ease-in">
-        {/* <section className="h-[calc(50vh-6rem)]"></section> */}
-        <div className=" mb-4 bg-slate-50">Filter</div>
-        <CompanyList companies={companies} />
+        <Filter accFilter={filter} setFilter={setFilter} />
+        <CompanyList
+          companies={companies}
+          getNextPage={getNextPageCompanies}
+          hasMorePages={totalPages > accPage}
+        />
       </main>
       <footer className="h-24 w-full">INFO de contato</footer>
     </div>
