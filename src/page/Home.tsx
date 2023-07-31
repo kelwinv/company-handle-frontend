@@ -28,6 +28,7 @@ type companiesResponseType = {
 const Home = () => {
   const [companies, setCompanies] = useState<companiesType>([]);
   const [isLoadCompany, setIsLoadCompany] = useState<boolean>(true);
+  const [isLoadNewCompanies, setIsLoadNewCompanies] = useState<boolean>(false);
   const [accPage, setAccPage] = useState<number>(0);
   const [totalPages, setSetTotalPages] = useState<number>(1);
   const [filter, setFilter] = useState<filterType>({
@@ -66,12 +67,14 @@ const Home = () => {
   }, [filter]);
 
   const getNextPageCompanies = useCallback(async () => {
+    setIsLoadNewCompanies(true);
     const { data } = await api.get<companiesResponseType>("/companies", {
       params: { ...filter, start: accPage },
     });
     const companies = convertDataToCompanies(data.companies);
     setCompanies((oldCompanies) => [...oldCompanies, ...companies]);
     setAccPage((old) => old + 1);
+    setIsLoadNewCompanies(false);
   }, [filter, accPage]);
 
   useDidUpdateEffect(() => {
@@ -94,6 +97,7 @@ const Home = () => {
           getNextPage={getNextPageCompanies}
           hasMorePages={totalPages > accPage}
           isLoading={isLoadCompany}
+          isLoadingNewCompanies={isLoadNewCompanies}
         />
       </main>
       <footer className="h-24 w-full">INFO de contato</footer>
