@@ -40,16 +40,19 @@ const Filter: React.FC<FilterProps> = ({ setFilter, accFilter }) => {
   const [companyName, setCompanyName] = useState("");
   const [openOrderList, setOpenOrderList] = useState(false);
 
-  const updateFilter = useCallback(() => {
-    const newFilter = {
-      company_name: companyName || null,
-      limit,
-      sort,
-      direction,
-    };
+  const updateFilter = useCallback(
+    ({ newLimit }: { newLimit?: number }) => {
+      const newFilter = {
+        company_name: companyName || null,
+        limit: newLimit || limit,
+        sort,
+        direction,
+      };
 
-    setFilter((oldFilter) => ({ ...oldFilter, ...newFilter }));
-  }, [limit, sort, direction, companyName, setFilter]);
+      setFilter((oldFilter) => ({ ...oldFilter, ...newFilter }));
+    },
+    [limit, sort, direction, companyName, setFilter],
+  );
 
   return (
     <div className="m-auto flex w-full flex-col justify-between gap-4 md:flex-row">
@@ -68,13 +71,13 @@ const Filter: React.FC<FilterProps> = ({ setFilter, accFilter }) => {
             value={limit}
             onChange={(e) => {
               setLimit(parseInt(e.target.value as string));
-              updateFilter();
+              updateFilter({ newLimit: parseInt(e.target.value as string) });
             }}
             label="Limit"
             variant="standard"
           >
-            {[5, 10, 15, 20, 25, 30].map((value) => (
-              <MenuItem key={value} value={value}>
+            {[5, 10, 15, 20, 25, 30].map((value, idx) => (
+              <MenuItem key={`${value}-${idx}`} value={value}>
                 {value}
               </MenuItem>
             ))}
@@ -91,12 +94,12 @@ const Filter: React.FC<FilterProps> = ({ setFilter, accFilter }) => {
             onChange={(e) => setCompanyName(e.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
-                updateFilter();
+                updateFilter({});
               }
             }}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton onClick={() => updateFilter()}>
+                <IconButton onClick={() => updateFilter({})}>
                   <AiOutlineSearch />
                 </IconButton>
               </InputAdornment>
@@ -152,7 +155,7 @@ const Filter: React.FC<FilterProps> = ({ setFilter, accFilter }) => {
           <Button
             onClick={() => {
               setOpenOrderList(false);
-              updateFilter();
+              updateFilter({});
             }}
           >
             Ok

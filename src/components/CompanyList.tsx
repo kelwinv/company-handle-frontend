@@ -29,8 +29,8 @@ const CompanyList = ({
     return (
       <main className="m-auto w-full flex-1 justify-center">
         <section className="flex flex-wrap justify-center gap-x-8 gap-y-6 xl:justify-start">
-          {[...new Array(6)].map(() => (
-            <CompanySkeleton />
+          {[...new Array(6)].map((_, idx) => (
+            <CompanySkeleton key={`skeleton-${idx}`} />
           ))}
         </section>
       </main>
