@@ -1,5 +1,4 @@
 import { Alert, Box, Button } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
 import { Company } from "./Company";
 import { CompanySkeleton } from "./CompanySkeleton";
 

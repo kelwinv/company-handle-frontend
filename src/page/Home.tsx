@@ -4,6 +4,7 @@ import { DefaultHeader } from "../components/DefaultHeader";
 import { api } from "../server/api";
 import { useDidUpdateEffect } from "../utils/useDidUpdateEffect";
 import { Filter, filterType } from "../components/Filter";
+import { FooterBar } from "../components/FooterBar";
 
 type companiesType = {
   id: string;
@@ -100,7 +101,7 @@ const Home = () => {
           isLoadingNewCompanies={isLoadNewCompanies}
         />
       </main>
-      <footer className="h-24 w-full">INFO de contato</footer>
+      <FooterBar />
     </div>
   );
 };
